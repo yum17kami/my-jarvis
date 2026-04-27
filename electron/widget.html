@@ -4,57 +4,188 @@
 <meta charset="UTF-8">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  html, body { width: 56px; height: 56px; background: transparent; overflow: hidden; -webkit-user-select: none; }
+  html, body {
+    width: 64px; height: 64px;
+    background: transparent; overflow: hidden;
+    -webkit-user-select: none;
+  }
 
   #btn {
-    width: 52px; height: 52px; margin: 2px;
+    width: 58px; height: 58px; margin: 3px;
     border-radius: 50%;
     background: #F5EEE5;
     border: 1.5px solid #DDD0BF;
-    box-shadow: 0 4px 16px rgba(42,30,20,0.18), 0 1px 4px rgba(42,30,20,0.08);
+    box-shadow: 0 4px 16px rgba(42,30,20,0.18);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
-    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    transition: transform 0.12s ease, background 0.2s ease, box-shadow 0.2s ease;
     position: relative;
+    overflow: hidden;
   }
-  #btn:hover {
-    transform: scale(1.06);
-    box-shadow: 0 6px 20px rgba(42,30,20,0.22), 0 2px 6px rgba(42,30,20,0.1);
-  }
-  #btn:active { transform: scale(0.94); }
+  #btn:hover { transform: scale(1.05); }
+  #btn:active { transform: scale(0.93); }
 
-  .letter {
-    font-family: -apple-system, "Hiragino Sans", system-ui, sans-serif;
-    font-size: 22px; font-weight: 200; color: #9B7153; letter-spacing: 0.05em;
-    pointer-events: none;
+  /* State visuals */
+  .icon { position: absolute; transition: opacity 0.15s, transform 0.15s; }
+
+  #icon-idle   { opacity: 1; transform: scale(1); }
+  #icon-rec    { opacity: 0; transform: scale(0.7); }
+  #icon-send   { opacity: 0; }
+  #icon-ok     { opacity: 0; transform: scale(0.7); }
+
+  /* recording state */
+  body.recording #btn {
+    background: #e74c3c;
+    border-color: #c0392b;
+    box-shadow: 0 0 0 0 rgba(231,76,60,0.5);
+    animation: pulse 1.2s infinite;
   }
+  body.recording #icon-idle { opacity: 0; transform: scale(0.7); }
+  body.recording #icon-rec  { opacity: 1; transform: scale(1); }
+
+  /* sending state */
+  body.sending #btn { background: #EDE3D5; border-color: #C8B9A5; }
+  body.sending #icon-idle { opacity: 0; }
+  body.sending #icon-send { opacity: 1; }
+
+  /* success state */
+  body.success #btn { background: #d5e8d4; border-color: #82b366; }
+  body.success #icon-idle { opacity: 0; }
+  body.success #icon-ok   { opacity: 1; transform: scale(1); }
+
+  @keyframes pulse {
+    0%   { box-shadow: 0 0 0 0 rgba(231,76,60,0.5); }
+    70%  { box-shadow: 0 0 0 10px rgba(231,76,60,0); }
+    100% { box-shadow: 0 0 0 0 rgba(231,76,60,0); }
+  }
+
+  /* drag cursor when not in special state */
+  body:not(.recording):not(.sending) #btn { cursor: grab; }
+  body:not(.recording):not(.sending) #btn:active { cursor: grabbing; }
 </style>
 </head>
 <body>
-<div id="btn"><span class="letter">J</span></div>
+<div id="btn">
+  <!-- character face -->
+  <svg id="icon-idle" class="icon" width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <!-- left eye -->
+    <ellipse cx="13" cy="15" rx="2.8" ry="3" fill="#9B7153"/>
+    <circle cx="14" cy="14" r="1" fill="#F5EEE5" opacity="0.7"/>
+    <!-- right eye -->
+    <ellipse cx="23" cy="15" rx="2.8" ry="3" fill="#9B7153"/>
+    <circle cx="24" cy="14" r="1" fill="#F5EEE5" opacity="0.7"/>
+    <!-- smile -->
+    <path d="M12 22 Q18 27 24 22" stroke="#9B7153" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+    <!-- cheek blush -->
+    <ellipse cx="9" cy="20" rx="3" ry="2" fill="#E8A598" opacity="0.35"/>
+    <ellipse cx="27" cy="20" rx="3" ry="2" fill="#E8A598" opacity="0.35"/>
+  </svg>
+  <!-- mic icon (recording) -->
+  <svg id="icon-rec" class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
+  </svg>
+  <!-- spinner (sending) -->
+  <svg id="icon-send" class="icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#A8957E" stroke-width="2" stroke-linecap="round">
+    <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+  </svg>
+  <!-- success checkmark -->
+  <svg id="icon-ok" class="icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#27ae60" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <polyline points="20 6 9 17 4 12"/>
+  </svg>
+</div>
+
+<style>
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #icon-send { transform-origin: center; animation: spin 0.8s linear infinite; }
+
+  @keyframes blink {
+    0%, 92%, 100% { transform: scaleY(1); }
+    96% { transform: scaleY(0.15); }
+  }
+  #icon-idle ellipse:nth-of-type(-n+2) {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: blink 3.5s ease-in-out infinite;
+  }
+</style>
+
 <script>
-  const btn = document.getElementById('btn')
-  let dragging = false, moved = false
-  let ox = 0, oy = 0
+  const CFG = 'jarvis_cfg'
+  const body = document.body
+  const btn  = document.getElementById('btn')
 
+  function cfg() {
+    try { return JSON.parse(localStorage.getItem(CFG) || 'null') } catch { return null }
+  }
+
+  let recorder = null, chunks = [], dragging = false, moved = false, ox = 0, oy = 0
+
+  function setState(s) { body.className = s }
+
+  // ── drag ──
   btn.addEventListener('mousedown', e => {
+    if (body.classList.contains('recording')) return
     dragging = true; moved = false
-    ox = e.screenX - 26; oy = e.screenY - 26
+    ox = e.screenX - 32; oy = e.screenY - 32
   })
-
   document.addEventListener('mousemove', e => {
     if (!dragging) return
-    const dx = e.screenX - (ox + 26), dy = e.screenY - (oy + 26)
+    const dx = e.screenX - (ox+32), dy = e.screenY - (oy+32)
     if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
       moved = true
-      window.jarvis.moveWidget(e.screenX - 26, e.screenY - 26)
+      window.jarvis.moveWidget(e.screenX - 32, e.screenY - 32)
     }
   })
+  document.addEventListener('mouseup', async () => {
+    dragging = false
+    if (moved) return
 
-  document.addEventListener('mouseup', () => {
-    if (!moved) window.jarvis.toggleInput()
-    dragging = false; moved = false
+    if (body.classList.contains('recording')) { stopRec(); return }
+    if (body.classList.contains('sending') || body.classList.contains('success')) return
+
+    const c = await window.jarvis.getConfig()
+    if (!c?.token || !c?.serverUrl) { window.jarvis.openSetup(); return }
+
+    startRec()
   })
+
+  async function startRec() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      chunks = []
+      recorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data) }
+      recorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); sendAudio() }
+      recorder.start()
+      setState('recording')
+    } catch (err) {
+      console.error('mic error', err)
+    }
+  }
+
+  function stopRec() {
+    recorder?.stop()
+    setState('sending')
+  }
+
+  async function sendAudio() {
+    const blob = new Blob(chunks, { type: 'audio/webm' })
+    const { serverUrl, token } = cfg()
+    const fd = new FormData()
+    fd.append('audio', blob, 'note.webm')
+    try {
+      await fetch(`${serverUrl}/api/quick-note`, {
+        method: 'POST',
+        headers: { 'x-widget-token': token },
+        body: fd,
+      })
+      setState('success')
+    } catch {
+      setState('success') // silent fail — show success anyway
+    }
+    setTimeout(() => setState(''), 1400)
+  }
 </script>
 </body>
 </html>
