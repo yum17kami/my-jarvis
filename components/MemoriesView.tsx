@@ -31,12 +31,13 @@ interface MemoriesViewProps {
 }
 
 const CATEGORY_LABELS: Record<string, { label: string; color: string }> = {
-  fact:       { label: '事実',   color: 'bg-amber-100 text-amber-800 border-amber-200' },
-  value:      { label: '価値観', color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+  fact:       { label: '事実',     color: 'bg-amber-100 text-amber-800 border-amber-200' },
+  value:      { label: '価値観',   color: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
   pattern:    { label: 'パターン', color: 'bg-blue-100 text-blue-800 border-blue-200' },
-  goal:       { label: '目標',   color: 'bg-purple-100 text-purple-800 border-purple-200' },
-  preference: { label: '好み',   color: 'bg-rose-100 text-rose-800 border-rose-200' },
-  emotion:    { label: '感情',   color: 'bg-orange-100 text-orange-800 border-orange-200' },
+  goal:       { label: '目標',     color: 'bg-purple-100 text-purple-800 border-purple-200' },
+  preference: { label: '好み',     color: 'bg-rose-100 text-rose-800 border-rose-200' },
+  emotion:    { label: '感情',     color: 'bg-orange-100 text-orange-800 border-orange-200' },
+  meta:       { label: 'メタ洞察', color: 'bg-violet-100 text-violet-800 border-violet-200' },
 }
 
 function formatDate(iso: string) {
