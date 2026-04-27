@@ -29,36 +29,35 @@ export async function extractAndStoreMemories(
 
   for (const memory of memories) {
     const embedding = await createEmbedding(memory.content)
-    await supabase.from('memories').insert({
-      user_id: userId,
-      category: memory.category,
-      content: memory.content,
-      embedding,
-      source_message_id: messageId,
+
+    // Check for similar existing memory — if found, reinforce it instead of duplicating
+    const { data: similar } = await supabase.rpc('search_memories', {
+      query_embedding: embedding,
+      user_id_param: userId,
+      match_count: 1,
     })
-  }
 
-  // After all memory inserts, enforce 300-memory cap
-  const { count } = await supabase
-    .from('memories')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-
-  if ((count || 0) > 300) {
-    const { data: oldest } = await supabase
-      .from('memories')
-      .select('id')
-      .eq('user_id', userId)
-      .order('created_at', { ascending: true })
-      .limit((count || 0) - 300)
-
-    if (oldest && oldest.length > 0) {
+    if (similar && similar.length > 0 && similar[0].similarity > 0.85) {
+      // Reinforce existing memory: bump mention_count
       await supabase
         .from('memories')
-        .delete()
-        .in('id', oldest.map((m: { id: string }) => m.id))
+        .update({ mention_count: similar[0].mention_count + 1, updated_at: new Date().toISOString() })
+        .eq('id', similar[0].id)
+    } else {
+      // New knowledge — store it
+      await supabase.from('memories').insert({
+        user_id: userId,
+        category: memory.category,
+        content: memory.content,
+        embedding,
+        source_message_id: messageId,
+      })
     }
   }
+
+  // Clean up raw messages older than 30 days — they've already been distilled into memories
+  const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+  await supabase.from('messages').delete().eq('user_id', userId).lt('created_at', cutoff)
 
   await updateHypotheses(supabase, userId)
 }
