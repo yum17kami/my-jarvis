@@ -3,15 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * { margin: 0; padding: 0; box-sizing: border-box; background: transparent; }
   html, body {
     width: 64px; height: 64px;
-    background: transparent; overflow: visible;
+    background: transparent !important;
+    overflow: hidden;
     -webkit-user-select: none;
   }
 
   #btn {
     width: 64px; height: 64px;
+    background: transparent;
     display: flex; align-items: center; justify-content: center;
     cursor: grab;
     transition: transform 0.12s ease;
