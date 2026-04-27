@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body {
+    width: 320px; height: 148px; overflow: hidden;
+    font-family: -apple-system, "Hiragino Sans", system-ui, sans-serif;
+    background: #F5EEE5; color: #2A1E14;
+    border-radius: 14px; border: 1px solid #DDD0BF;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+  p { font-size: 11px; color: #A8957E; }
+  input {
+    width: 100%; padding: 7px 10px;
+    background: #FDFCFA; border: 1px solid #DDD0BF; border-radius: 8px;
+    font-size: 12px; color: #2A1E14; outline: none; font-family: inherit;
+  }
+  input:focus { border-color: #9B7153; }
+  .row { display: flex; align-items: center; justify-content: space-between; }
+  .err { font-size: 10px; color: #c0392b; }
+  button {
+    padding: 6px 16px; background: #9B7153; color: #FDFCFA;
+    border: none; border-radius: 8px; font-size: 12px; cursor: pointer; font-family: inherit;
+  }
+  button:hover { background: #7A5740; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p>Jarvis ウィジェット — 初回接続</p>
+  <input id="url" type="text" placeholder="サーバーURL (例: http://localhost:3000)" />
+  <input id="tok" type="text" placeholder="ウィジェットトークン (memoriesページからコピー)" />
+  <div class="row">
+    <span id="err" class="err"></span>
+    <button id="btn">接続</button>
+  </div>
+</div>
+<script>
+  const CFG = 'jarvis_cfg'
+  const urlEl = document.getElementById('url')
+  const tokEl = document.getElementById('tok')
+  const errEl = document.getElementById('err')
+
+  // pre-fill existing
+  try {
+    const c = JSON.parse(localStorage.getItem(CFG) || 'null')
+    if (c?.serverUrl) urlEl.value = c.serverUrl
+  } catch {}
+
+  document.getElementById('btn').addEventListener('click', async () => {
+    const serverUrl = urlEl.value.trim().replace(/\/$/, '')
+    const token = tokEl.value.trim()
+    errEl.textContent = ''
+    if (!serverUrl || !token) { errEl.textContent = 'URLとトークンを入力してください'; return }
+
+    try {
+      const res = await fetch(`${serverUrl}/api/quick-note`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-widget-token': token },
+        body: JSON.stringify({ text: '__ping__' }),
+      })
+      if (res.status === 401) { errEl.textContent = 'トークンが無効です'; return }
+
+      window.jarvis.saveConfig({ serverUrl, token })
+      window.jarvis.setupDone()
+    } catch {
+      errEl.textContent = 'サーバーに接続できません'
+    }
+  })
+
+  tokEl.addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('btn').click() })
+</script>
+</body>
+</html>
