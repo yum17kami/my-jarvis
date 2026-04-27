@@ -16,14 +16,14 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
       <div className={cn(
         'max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
         isUser
-          ? 'bg-sand-900 text-sand-50 rounded-br-sm'
-          : 'bg-sand-50 text-sand-900 rounded-bl-sm border border-sand-300 shadow-sm'
+          ? 'bg-[#2A1E14] text-[#FDFCFA] rounded-br-sm'
+          : 'bg-[#FDFCFA] text-[#2A1E14] rounded-bl-sm border border-[#DDD0BF] shadow-sm'
       )}>
         <p className="whitespace-pre-wrap">{mainText}</p>
         {suggestion && (
           <p className={cn(
             'mt-2 pt-2 text-xs border-t',
-            isUser ? 'border-sand-700 text-sand-400' : 'border-sand-300 text-wood'
+            isUser ? 'border-[#5C4D3D] text-[#C8B9A5]' : 'border-[#DDD0BF] text-[#9B7153]'
           )}>
             💡 {suggestion}
           </p>

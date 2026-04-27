@@ -1,20 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --color-sand-50: #FDFCFA;
-  --color-sand-100: #F5EEE5;
-  --color-sand-200: #EDE3D5;
-  --color-sand-300: #DDD0BF;
-  --color-sand-400: #C8B9A5;
-  --color-sand-500: #A8957E;
-  --color-sand-600: #7A6A58;
-  --color-sand-700: #5C4D3D;
-  --color-sand-900: #2A1E14;
-  --color-wood: #9B7153;
-  --color-wood-light: #C4A07A;
-  --color-wood-dark: #7A5740;
-}
-
 body {
   background-color: #F5EEE5;
   color: #2A1E14;

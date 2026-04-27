@@ -14,6 +14,7 @@ export default async function MemoriesPage() {
     { data: hypotheses },
     { count: conversationCount },
     { count: memoryCount },
+    { data: profile },
   ] = await Promise.all([
     supabase
       .from('memories')
@@ -34,6 +35,11 @@ export default async function MemoriesPage() {
       .from('memories')
       .select('*', { count: 'exact', head: true })
       .eq('user_id', user.id),
+    supabase
+      .from('profiles')
+      .select('widget_token')
+      .eq('id', user.id)
+      .single(),
   ])
 
   const stats = {
@@ -43,19 +49,32 @@ export default async function MemoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-sand-100">
+    <div className="min-h-screen bg-[#F5EEE5]">
       {/* Top nav */}
-      <div className="sticky top-0 z-10 bg-sand-100/80 backdrop-blur border-b border-sand-300/60">
+      <div className="sticky top-0 z-10 bg-[#F5EEE5]/80 backdrop-blur border-b border-[#DDD0BF]/60">
         <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4">
           <Link
             href="/chat"
-            className="flex items-center gap-1.5 text-sm text-sand-500 hover:text-sand-900 transition-colors"
+            className="flex items-center gap-1.5 text-sm text-[#A8957E] hover:text-[#2A1E14] transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             チャットに戻る
           </Link>
-          <span className="text-sand-300">|</span>
-          <h1 className="text-sm font-medium text-sand-700 tracking-wide">Jarvisが知っていること</h1>
+          <span className="text-[#DDD0BF]">|</span>
+          <h1 className="text-sm font-medium text-[#5C4D3D] tracking-wide">Jarvisが知っていること</h1>
+        </div>
+      </div>
+
+      {/* Widget token */}
+      <div className="max-w-4xl mx-auto px-6 pt-8">
+        <div className="bg-[#FDFCFA] border border-[#DDD0BF] rounded-2xl px-5 py-4 flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-medium text-[#9B7153] mb-0.5">ウィジェットトークン</p>
+            <p className="text-xs text-[#A8957E]">デスクトップウィジェットの初回接続時に貼り付けてください</p>
+          </div>
+          <code className="text-xs font-mono bg-[#EDE3D5] text-[#5C4D3D] px-3 py-1.5 rounded-lg select-all flex-shrink-0">
+            {profile?.widget_token ?? '—'}
+          </code>
         </div>
       </div>
 

@@ -31,46 +31,46 @@ export function HypothesesPanel() {
 
   return (
     <div className={cn(
-      'fixed right-0 top-0 h-full bg-sand-50 border-l border-sand-300 transition-all duration-300 flex flex-col z-10',
+      'fixed right-0 top-0 h-full bg-[#FDFCFA] border-l border-[#DDD0BF] transition-all duration-300 flex flex-col z-10',
       open ? 'w-72' : 'w-11'
     )}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-3 py-4 text-sand-500 hover:text-sand-700 transition-colors min-h-[56px] relative"
+        className="flex items-center gap-2 px-3 py-4 text-[#A8957E] hover:text-[#5C4D3D] transition-colors min-h-[56px] relative"
         title={open ? 'パネルを閉じる' : 'Jarvisの理解を見る'}
       >
         <Sparkles className="w-4 h-4 flex-shrink-0" />
         {open && (
           <>
-            <span className="text-xs font-medium text-sand-600 whitespace-nowrap tracking-wide">Jarvisの理解</span>
-            <ChevronLeft className="w-4 h-4 ml-auto text-sand-400" />
+            <span className="text-xs font-medium text-[#7A6A58] whitespace-nowrap tracking-wide">Jarvisの理解</span>
+            <ChevronLeft className="w-4 h-4 ml-auto text-[#C8B9A5]" />
           </>
         )}
         {!open && hypotheses.length > 0 && (
-          <span className="absolute right-2 top-3.5 w-1.5 h-1.5 bg-wood rounded-full" />
+          <span className="absolute right-2 top-3.5 w-1.5 h-1.5 bg-[#9B7153] rounded-full" />
         )}
       </button>
 
       {open && (
         <div className="flex-1 overflow-y-auto px-4 pb-6 space-y-5">
           {hypotheses.length === 0 ? (
-            <p className="text-sand-400 text-xs leading-relaxed mt-1">
+            <p className="text-[#C8B9A5] text-xs leading-relaxed mt-1">
               会話を重ねると、ここにあなたへの理解が積み上がります
             </p>
           ) : (
             hypotheses.map((h, i) => (
               <div key={i} className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-medium text-wood">{h.category}</span>
-                  <span className="text-xs text-sand-400">{Math.round(h.confidence * 100)}%</span>
+                  <span className="text-xs font-medium text-[#9B7153]">{h.category}</span>
+                  <span className="text-xs text-[#C8B9A5]">{Math.round(h.confidence * 100)}%</span>
                 </div>
-                <div className="relative h-0.5 bg-sand-200 rounded-full overflow-hidden">
+                <div className="relative h-0.5 bg-[#EDE3D5] rounded-full overflow-hidden">
                   <div
-                    className="absolute inset-y-0 left-0 bg-wood rounded-full transition-all duration-700"
+                    className="absolute inset-y-0 left-0 bg-[#9B7153] rounded-full transition-all duration-700"
                     style={{ width: `${h.confidence * 100}%` }}
                   />
                 </div>
-                <p className="text-xs text-sand-600 leading-relaxed">{h.statement}</p>
+                <p className="text-xs text-[#7A6A58] leading-relaxed">{h.statement}</p>
               </div>
             ))
           )}

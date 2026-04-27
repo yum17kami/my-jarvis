@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 56px; height: 56px; background: transparent; overflow: hidden; -webkit-user-select: none; }
+
+  #btn {
+    width: 52px; height: 52px; margin: 2px;
+    border-radius: 50%;
+    background: #F5EEE5;
+    border: 1.5px solid #DDD0BF;
+    box-shadow: 0 4px 16px rgba(42,30,20,0.18), 0 1px 4px rgba(42,30,20,0.08);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: transform 0.12s ease, box-shadow 0.12s ease;
+    position: relative;
+  }
+  #btn:hover {
+    transform: scale(1.06);
+    box-shadow: 0 6px 20px rgba(42,30,20,0.22), 0 2px 6px rgba(42,30,20,0.1);
+  }
+  #btn:active { transform: scale(0.94); }
+
+  .letter {
+    font-family: -apple-system, "Hiragino Sans", system-ui, sans-serif;
+    font-size: 22px; font-weight: 200; color: #9B7153; letter-spacing: 0.05em;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div id="btn"><span class="letter">J</span></div>
+<script>
+  const btn = document.getElementById('btn')
+  let dragging = false, moved = false
+  let ox = 0, oy = 0
+
+  btn.addEventListener('mousedown', e => {
+    dragging = true; moved = false
+    ox = e.screenX - 26; oy = e.screenY - 26
+  })
+
+  document.addEventListener('mousemove', e => {
+    if (!dragging) return
+    const dx = e.screenX - (ox + 26), dy = e.screenY - (oy + 26)
+    if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+      moved = true
+      window.jarvis.moveWidget(e.screenX - 26, e.screenY - 26)
+    }
+  })
+
+  document.addEventListener('mouseup', () => {
+    if (!moved) window.jarvis.toggleInput()
+    dragging = false; moved = false
+  })
+</script>
+</body>
+</html>

@@ -62,8 +62,8 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       title={recording ? '録音を停止' : '音声で入力'}
       className={cn(
         'p-2 rounded-full transition-all flex-shrink-0',
-        recording ? 'text-red-400 animate-pulse' : 'text-sand-400 hover:text-sand-600',
-        loading && 'text-wood cursor-wait',
+        recording ? 'text-red-400 animate-pulse' : 'text-[#C8B9A5] hover:text-[#7A6A58]',
+        loading && 'text-[#9B7153] cursor-wait',
         (disabled || loading) && !recording && 'opacity-40'
       )}
     >
