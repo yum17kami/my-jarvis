@@ -22,11 +22,11 @@ function createWidget() {
     y: height - 108,
     frame: false,
     transparent: true,
-    backgroundColor: '#00000000',
     alwaysOnTop: true,
     skipTaskbar: true,
     resizable: false,
     hasShadow: false,
+    show: false,
     // panel = macOS NSPanel: stays on top without stealing focus
     type: process.platform === 'darwin' ? 'panel' : undefined,
     webPreferences: {
@@ -38,6 +38,7 @@ function createWidget() {
   widgetWindow.loadFile(path.join(__dirname, 'widget.html'))
   widgetWindow.setAlwaysOnTop(true, 'screen-saver')
   widgetWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
+  widgetWindow.once('ready-to-show', () => widgetWindow.show())
 }
 
 function openSetup() {
