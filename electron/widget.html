@@ -10,7 +10,6 @@
     overflow: hidden;
     -webkit-user-select: none;
   }
-
   #btn {
     width: 64px; height: 64px;
     background: transparent;
@@ -21,83 +20,41 @@
   }
   #btn:hover { transform: scale(1.07); }
   #btn:active { transform: scale(0.92); }
-  body.recording #btn,
-  body.sending #btn { cursor: default; }
+  body.recording #btn, body.sending #btn { cursor: default; }
 
   #eye-l, #eye-r { transition: fill 0.2s ease; }
 
-  @keyframes eyeFade {
-    from { opacity: 0.25; }
-    to   { opacity: 1; }
-  }
-  body.sending #eye-l,
-  body.sending #eye-r {
-    fill: #7A6452;
-    animation: eyeFade 0.65s ease-in-out infinite alternate;
-  }
-
-  body.recording #eye-l,
-  body.recording #eye-r { fill: #e74c3c; }
-
-  body.success #eye-l,
-  body.success #eye-r { fill: #2ed573; }
+  @keyframes eyeFade { from { opacity: 0.25; } to { opacity: 1; } }
+  body.sending  #eye-l, body.sending  #eye-r { fill: #7A6452; animation: eyeFade 0.65s ease-in-out infinite alternate; }
+  body.recording #eye-l, body.recording #eye-r { fill: #e74c3c; }
+  body.success  #eye-l, body.success  #eye-r { fill: #2ed573; }
 </style>
 </head>
 <body>
 <div id="btn">
-  <svg id="face" width="54" height="50" viewBox="0 0 54 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg width="52" height="48" viewBox="0 0 52 48" fill="none">
     <defs>
-      <linearGradient id="hg" x1="27" y1="0" x2="27" y2="50" gradientUnits="userSpaceOnUse">
+      <linearGradient id="hg" x1="27" y1="0" x2="27" y2="48" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#2C2118"/>
         <stop offset="100%" stop-color="#110C07"/>
       </linearGradient>
-      <!-- shadow filter contained within SVG — avoids CSS filter white-box bug -->
-      <filter id="sh" x="-25%" y="-25%" width="150%" height="175%">
-        <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000000" flood-opacity="0.55"/>
-      </filter>
-      <!-- red glow for recording -->
-      <filter id="rec-glow" x="-25%" y="-25%" width="150%" height="175%">
-        <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#e74c3c" flood-opacity="0.9"/>
-      </filter>
-      <!-- green glow for success -->
-      <filter id="ok-glow" x="-25%" y="-25%" width="150%" height="175%">
-        <feDropShadow dx="0" dy="0" stdDeviation="7" flood-color="#2ed573" flood-opacity="0.8"/>
-      </filter>
     </defs>
-
-    <!-- head — default state -->
-    <rect id="head" x="2" y="2" width="50" height="44" rx="14" fill="url(#hg)" filter="url(#sh)"/>
-    <!-- top gloss -->
-    <rect x="14" y="4" width="24" height="3.5" rx="1.75" fill="white" opacity="0.08"/>
-    <!-- left eye -->
-    <rect id="eye-l" x="8" y="17" width="15" height="5" rx="2.5" fill="#C8A050"/>
-    <rect x="10" y="18.5" width="9" height="2" rx="1" fill="white" opacity="0.22"/>
-    <!-- right eye -->
-    <rect id="eye-r" x="31" y="17" width="15" height="5" rx="2.5" fill="#C8A050"/>
-    <rect x="33" y="18.5" width="9" height="2" rx="1" fill="white" opacity="0.22"/>
-    <!-- mouth -->
-    <path d="M19 32 Q27 37 35 32" stroke="#3A2A18" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+    <rect x="1" y="1" width="50" height="44" rx="14" fill="url(#hg)"/>
+    <rect x="13" y="3" width="24" height="3.5" rx="1.75" fill="white" opacity="0.08"/>
+    <rect id="eye-l" x="7" y="17" width="15" height="5" rx="2.5" fill="#C8A050"/>
+    <rect x="9" y="18.5" width="9" height="2" rx="1" fill="white" opacity="0.22"/>
+    <rect id="eye-r" x="30" y="17" width="15" height="5" rx="2.5" fill="#C8A050"/>
+    <rect x="32" y="18.5" width="9" height="2" rx="1" fill="white" opacity="0.22"/>
+    <path d="M19 32 Q26 36.5 33 32" stroke="#3A2A18" stroke-width="1.4" stroke-linecap="round" fill="none"/>
   </svg>
 </div>
-
 <script>
   const body = document.body
   const btn  = document.getElementById('btn')
-  const head = document.getElementById('head')
-
   let recorder = null, chunks = [], dragging = false, moved = false, ox = 0, oy = 0
+  let rafId = null, pendingX = 0, pendingY = 0
 
-  function setState(s) {
-    body.className = s
-    // swap SVG shadow filter based on state
-    if (s === 'recording') {
-      head.setAttribute('filter', 'url(#rec-glow)')
-    } else if (s === 'success') {
-      head.setAttribute('filter', 'url(#ok-glow)')
-    } else {
-      head.setAttribute('filter', 'url(#sh)')
-    }
-  }
+  function setState(s) { body.className = s }
 
   btn.addEventListener('mousedown', e => {
     if (body.classList.contains('recording')) return
@@ -108,7 +65,12 @@
     if (!dragging) return
     if (Math.abs(e.screenX - (ox+32)) > 4 || Math.abs(e.screenY - (oy+32)) > 4) {
       moved = true
-      window.jarvis.moveWidget(e.screenX - 32, e.screenY - 32)
+      pendingX = e.screenX - 32
+      pendingY = e.screenY - 32
+      if (!rafId) rafId = requestAnimationFrame(() => {
+        window.jarvis.moveWidget(pendingX, pendingY)
+        rafId = null
+      })
     }
   })
   document.addEventListener('mouseup', async () => {
@@ -116,7 +78,6 @@
     if (moved) return
     if (body.classList.contains('recording')) { stopRec(); return }
     if (body.classList.contains('sending') || body.classList.contains('success')) return
-
     const c = await window.jarvis.getConfig()
     if (!c?.token || !c?.serverUrl) { window.jarvis.openSetup(); return }
     startRec()
@@ -131,15 +92,10 @@
       recorder.onstop = () => { stream.getTracks().forEach(t => t.stop()); sendAudio() }
       recorder.start()
       setState('recording')
-    } catch (err) {
-      console.error('mic error', err)
-    }
+    } catch (err) { console.error('mic error', err) }
   }
 
-  function stopRec() {
-    recorder?.stop()
-    setState('sending')
-  }
+  function stopRec() { recorder?.stop(); setState('sending') }
 
   async function sendAudio() {
     const blob = new Blob(chunks, { type: 'audio/webm' })
@@ -148,13 +104,11 @@
     fd.append('audio', blob, 'note.webm')
     try {
       await fetch(`${serverUrl}/api/quick-note`, {
-        method: 'POST',
-        headers: { 'x-widget-token': token },
-        body: fd,
+        method: 'POST', headers: { 'x-widget-token': token }, body: fd,
       })
     } catch {}
     setState('success')
-    setTimeout(() => setState('', 1400))
+    setTimeout(() => setState(''), 1400)
   }
 </script>
 </body>
