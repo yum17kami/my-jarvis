@@ -1,11 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { extractAndStoreMemories } from '@/lib/memory/extractor'
+import OpenAI from 'openai'
 
 const supabaseAdmin = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
 
 export async function POST(req: NextRequest) {
   const token = req.headers.get('x-widget-token')
@@ -21,7 +24,26 @@ export async function POST(req: NextRequest) {
   if (!profile) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const userId = profile.id
-  const { text } = await req.json() as { text: string }
+
+  // Detect content type: audio FormData vs JSON
+  let text: string
+  const contentType = req.headers.get('content-type') || ''
+
+  if (contentType.includes('multipart/form-data')) {
+    const formData = await req.formData()
+    const audio = formData.get('audio') as File | null
+    if (!audio) return NextResponse.json({ error: 'No audio' }, { status: 400 })
+
+    const transcription = await openai.audio.transcriptions.create({
+      model: 'whisper-1',
+      file: audio,
+      language: 'ja',
+    })
+    text = transcription.text
+  } else {
+    const body = await req.json() as { text: string }
+    text = body.text
+  }
 
   // Ping check (setup verification)
   if (text === '__ping__') return NextResponse.json({ ok: true })
