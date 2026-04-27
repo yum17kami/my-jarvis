@@ -38,6 +38,28 @@ export async function extractAndStoreMemories(
     })
   }
 
+  // After all memory inserts, enforce 300-memory cap
+  const { count } = await supabase
+    .from('memories')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+
+  if ((count || 0) > 300) {
+    const { data: oldest } = await supabase
+      .from('memories')
+      .select('id')
+      .eq('user_id', userId)
+      .order('created_at', { ascending: true })
+      .limit((count || 0) - 300)
+
+    if (oldest && oldest.length > 0) {
+      await supabase
+        .from('memories')
+        .delete()
+        .in('id', oldest.map((m: { id: string }) => m.id))
+    }
+  }
+
   await updateHypotheses(supabase, userId)
 }
 

@@ -13,17 +13,18 @@ export function MessageBubble({ role, content }: MessageBubbleProps) {
 
   return (
     <div className={cn('flex', isUser ? 'justify-end' : 'justify-start')}>
-      <div
-        className={cn(
-          'max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
-          isUser
-            ? 'bg-sky-600 text-white rounded-br-sm'
-            : 'bg-zinc-800 text-zinc-100 rounded-bl-sm'
-        )}
-      >
+      <div className={cn(
+        'max-w-[78%] rounded-2xl px-4 py-3 text-sm leading-relaxed',
+        isUser
+          ? 'bg-sand-900 text-sand-50 rounded-br-sm'
+          : 'bg-sand-50 text-sand-900 rounded-bl-sm border border-sand-300 shadow-sm'
+      )}>
         <p className="whitespace-pre-wrap">{mainText}</p>
         {suggestion && (
-          <p className="mt-2 pt-2 border-t border-zinc-700 text-sky-300 text-xs">
+          <p className={cn(
+            'mt-2 pt-2 text-xs border-t',
+            isUser ? 'border-sand-700 text-sand-400' : 'border-sand-300 text-wood'
+          )}>
             💡 {suggestion}
           </p>
         )}

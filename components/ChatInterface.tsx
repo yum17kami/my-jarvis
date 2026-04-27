@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { Send, Loader2 } from 'lucide-react'
+import { Send, Loader2, BookOpen } from 'lucide-react'
+import Link from 'next/link'
 import { MessageBubble } from './MessageBubble'
 import { VoiceInput } from './VoiceInput'
 import { HypothesesPanel } from './HypothesesPanel'
@@ -37,9 +38,7 @@ export function ChatInterface() {
   const send = useCallback(async (text: string) => {
     if (!text.trim() || loading) return
     setInput('')
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'
-    }
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
 
     const userMessage: Message = { role: 'user', content: text }
     setMessages((prev) => [...prev, userMessage])
@@ -55,10 +54,7 @@ export function ChatInterface() {
       const { message } = await res.json()
       setMessages((prev) => [...prev, { role: 'assistant', content: message }])
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: 'assistant', content: 'ちょっと待ってて。もう一度試してみて。' },
-      ])
+      setMessages((prev) => [...prev, { role: 'assistant', content: 'ちょっと待ってて。もう一度試してみて。' }])
     } finally {
       setLoading(false)
     }
@@ -78,19 +74,27 @@ export function ChatInterface() {
   }
 
   return (
-    <div className="flex h-screen bg-zinc-950 text-zinc-100">
+    <div className="flex h-screen bg-sand-100">
       <div className="flex-1 flex flex-col min-w-0 pr-11">
+
         {/* Header */}
-        <div className="flex-shrink-0 px-6 py-4 border-b border-zinc-800/60">
+        <div className="flex-shrink-0 px-6 py-4 flex items-center justify-between border-b border-sand-300/60">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-xl bg-sky-600 flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-bold text-sm">J</span>
+            <div className="w-8 h-8 rounded-xl bg-sand-200 border border-sand-300 flex items-center justify-center flex-shrink-0">
+              <span className="text-wood font-light text-sm tracking-widest">J</span>
             </div>
             <div>
-              <h1 className="text-sm font-semibold text-zinc-100">Jarvis</h1>
-              <p className="text-xs text-zinc-600">AIライフコーチ</p>
+              <h1 className="text-sm font-medium text-sand-900">Jarvis</h1>
+              <p className="text-xs text-sand-500">AIライフコーチ</p>
             </div>
           </div>
+          <Link
+            href="/memories"
+            className="flex items-center gap-1.5 text-xs text-sand-500 hover:text-wood transition-colors px-3 py-1.5 rounded-lg hover:bg-sand-200"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            記憶を見る
+          </Link>
         </div>
 
         {/* Messages */}
@@ -100,8 +104,12 @@ export function ChatInterface() {
           ))}
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-zinc-800 rounded-2xl rounded-bl-sm px-4 py-3">
-                <Loader2 className="w-4 h-4 animate-spin text-zinc-500" />
+              <div className="bg-sand-50 border border-sand-300 rounded-2xl rounded-bl-sm px-4 py-3 shadow-sm">
+                <div className="flex gap-1 items-center h-4">
+                  <span className="w-1.5 h-1.5 bg-sand-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                  <span className="w-1.5 h-1.5 bg-sand-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 bg-sand-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                </div>
               </div>
             </div>
           )}
@@ -109,8 +117,8 @@ export function ChatInterface() {
         </div>
 
         {/* Input */}
-        <div className="flex-shrink-0 px-6 py-4 border-t border-zinc-800/60">
-          <div className="flex items-end gap-2 bg-zinc-900 rounded-2xl px-3 py-2 border border-zinc-800">
+        <div className="flex-shrink-0 px-6 py-4 border-t border-sand-300/60">
+          <div className="flex items-end gap-2 bg-sand-50 rounded-2xl px-3 py-2 border border-sand-300">
             <VoiceInput
               onTranscript={(text) => {
                 setInput((prev) => prev + (prev ? ' ' : '') + text)
@@ -125,23 +133,21 @@ export function ChatInterface() {
               onKeyDown={handleKeyDown}
               placeholder="何でも話しかけて..."
               rows={1}
-              className="flex-1 bg-transparent resize-none outline-none text-sm text-zinc-100 placeholder:text-zinc-600 py-1.5 max-h-[120px] leading-relaxed"
+              className="flex-1 bg-transparent resize-none outline-none text-sm text-sand-900 placeholder:text-sand-400 py-1.5 max-h-[120px] leading-relaxed"
             />
             <button
               onClick={() => send(input)}
               disabled={!input.trim() || loading}
               className={cn(
                 'p-2 rounded-full transition-colors flex-shrink-0',
-                input.trim() && !loading
-                  ? 'text-sky-400 hover:text-sky-300'
-                  : 'text-zinc-700'
+                input.trim() && !loading ? 'text-wood hover:text-wood-dark' : 'text-sand-300'
               )}
             >
               <Send className="w-4 h-4" />
             </button>
           </div>
-          <p className="text-xs text-zinc-700 mt-2 text-center">
-            Enter で送信 · Shift+Enter で改行 · マイクで音声入力
+          <p className="text-xs text-sand-400 mt-2 text-center">
+            Enter で送信 · Shift+Enter で改行
           </p>
         </div>
       </div>

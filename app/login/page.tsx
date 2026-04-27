@@ -14,27 +14,27 @@ export default function LoginPage() {
     setLoading(true)
     await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${window.location.origin}/chat` },
+      options: { emailRedirectTo: `${window.location.origin}/auth/callback?next=/chat` },
     })
     setSent(true)
     setLoading(false)
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
-      <div className="w-full max-w-sm space-y-8">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-sky-600 mb-4">
-            <span className="text-white font-bold text-lg">J</span>
+    <div className="min-h-screen bg-sand-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-sm space-y-10">
+        <div className="text-center space-y-2">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-sand-200 border border-sand-300 mb-2">
+            <span className="text-wood font-light text-xl tracking-widest">J</span>
           </div>
-          <h1 className="text-2xl font-semibold text-zinc-100">Jarvis</h1>
-          <p className="mt-1 text-zinc-500 text-sm">あなたのAIライフコーチ</p>
+          <h1 className="text-2xl font-light tracking-wide text-sand-900">Jarvis</h1>
+          <p className="text-sand-500 text-sm">話すほど、あなたを理解していくAI</p>
         </div>
 
         {sent ? (
-          <div className="text-center space-y-2 bg-zinc-900 rounded-2xl p-6 border border-zinc-800">
-            <p className="text-zinc-200 font-medium">メールを送りました</p>
-            <p className="text-zinc-500 text-sm">{email} のリンクをクリックしてログイン</p>
+          <div className="text-center space-y-2 bg-sand-50 rounded-2xl p-8 border border-sand-300">
+            <p className="text-sand-700 font-medium">メールを送りました</p>
+            <p className="text-sand-500 text-sm leading-relaxed">{email}<br />のリンクをクリックしてログイン</p>
           </div>
         ) : (
           <form onSubmit={handleLogin} className="space-y-3">
@@ -44,21 +44,17 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="メールアドレス"
               required
-              className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-sky-500 transition-colors text-sm"
+              className="w-full bg-sand-50 border border-sand-300 rounded-xl px-4 py-3 text-sand-900 placeholder:text-sand-400 outline-none focus:border-wood transition-colors text-sm"
             />
             <button
               type="submit"
               disabled={loading || !email}
-              className="w-full bg-sky-600 hover:bg-sky-500 disabled:bg-zinc-800 disabled:text-zinc-600 text-white rounded-xl py-3 text-sm font-medium transition-colors"
+              className="w-full bg-wood hover:bg-wood-dark disabled:bg-sand-300 disabled:text-sand-500 text-sand-50 rounded-xl py-3 text-sm font-medium transition-colors"
             >
               {loading ? '送信中...' : 'マジックリンクでログイン'}
             </button>
           </form>
         )}
-
-        <p className="text-center text-xs text-zinc-600">
-          話すほど、あなたを理解していくAIです
-        </p>
       </div>
     </div>
   )

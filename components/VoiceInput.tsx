@@ -21,17 +21,13 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       const mediaRecorder = new MediaRecorder(stream)
       mediaRecorderRef.current = mediaRecorder
       chunksRef.current = []
-
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
+      mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data) }
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' })
         stream.getTracks().forEach((t) => t.stop())
         setLoading(true)
         await transcribe(blob)
       }
-
       mediaRecorder.start()
       setRecording(true)
     } catch (err) {
@@ -66,20 +62,14 @@ export function VoiceInput({ onTranscript, disabled }: VoiceInputProps) {
       title={recording ? '録音を停止' : '音声で入力'}
       className={cn(
         'p-2 rounded-full transition-all flex-shrink-0',
-        recording
-          ? 'bg-red-500 text-white animate-pulse'
-          : 'text-zinc-500 hover:text-zinc-300',
-        loading && 'text-sky-400 cursor-wait',
-        (disabled || loading) && !recording && 'opacity-50'
+        recording ? 'text-red-400 animate-pulse' : 'text-sand-400 hover:text-sand-600',
+        loading && 'text-wood cursor-wait',
+        (disabled || loading) && !recording && 'opacity-40'
       )}
     >
-      {loading ? (
-        <Loader2 className="w-5 h-5 animate-spin" />
-      ) : recording ? (
-        <MicOff className="w-5 h-5" />
-      ) : (
-        <Mic className="w-5 h-5" />
-      )}
+      {loading ? <Loader2 className="w-5 h-5 animate-spin" /> :
+       recording ? <MicOff className="w-5 h-5" /> :
+       <Mic className="w-5 h-5" />}
     </button>
   )
 }
